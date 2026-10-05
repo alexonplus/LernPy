@@ -11,10 +11,15 @@ class Language(Enum):
     RU = "ru"
     EN = "en"
 
+class PuzzleType(Enum):
+    OUTPUT = "output"
+    BUG = "bug"
+
 @dataclass
 class Puzzle:
     id: int
     difficulty: Difficulty
+    type: PuzzleType
     title: str
     code: str
     question: str

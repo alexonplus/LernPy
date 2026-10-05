@@ -1,14 +1,16 @@
+import json
+import os
 from rich.console import Console
 from rich.panel import Panel
 from rich.syntax import Syntax
-from rich.prompt import IntPrompt, Prompt
+from rich.prompt import IntPrompt
 from rich.text import Text
-import time
 
-from models import Puzzle, Difficulty, Language
+from models import Puzzle, Difficulty, Language, PuzzleType
 from i18n import UI_STRINGS
 
 console = Console()
+PROFILE_FILE = "profile.json"
 
 class GameEngine:
     def __init__(self, puzzles_db):
@@ -18,7 +20,21 @@ class GameEngine:
         self.puzzles = []
         self.score = 0
         self.total = 0
+        self.profile = self.load_profile()
         
+    def load_profile(self):
+        if os.path.exists(PROFILE_FILE):
+            try:
+                with open(PROFILE_FILE, "r", encoding="utf-8") as f:
+                    return json.load(f)
+            except:
+                pass
+        return {"xp": 0, "solved": 0}
+
+    def save_profile(self):
+        with open(PROFILE_FILE, "w", encoding="utf-8") as f:
+            json.dump(self.profile, f, indent=4)
+
     def _t(self, key, **kwargs):
         text = UI_STRINGS[self.lang.value].get(key, key)
         if kwargs:
@@ -60,7 +76,10 @@ class GameEngine:
         console.clear()
         title = Text(self._t("welcome_title"), style="bold green", justify="center")
         subtitle = Text(self._t("welcome_subtitle"), justify="center")
-        panel = Panel(Text.assemble(title, "\n", subtitle), border_style="green", expand=False)
+        
+        stats = Text(self._t("profile_stats", xp=self.profile['xp'], solved=self.profile['solved']), style="bold magenta", justify="center")
+        
+        panel = Panel(Text.assemble(title, "\n", subtitle, "\n", stats), border_style="green", expand=False)
         console.print(panel)
         console.input(f"\n[dim]{self._t('press_enter')}[/dim]")
 
@@ -75,11 +94,13 @@ class GameEngine:
         
         for idx, puzzle in enumerate(self.puzzles, 1):
             console.clear()
-            console.rule(f"[bold cyan]{self._t('puzzle')} {idx}/{self.total} - {puzzle.title}[/bold cyan]")
+            
+            puzzle_type_str = self._t("type_bug") if puzzle.type == PuzzleType.BUG else self._t("type_output")
+            console.rule(f"[bold cyan]{self._t('puzzle')} {idx}/{self.total} | {puzzle_type_str} | {puzzle.title}[/bold cyan]")
             
             # Show code
-            syntax = Syntax(puzzle.code, "python", theme="monokai", line_numbers=True)
-            console.print(Panel(syntax, title=self._t("code"), border_style="blue"))
+            syntax = Syntax(puzzle.code, "python", theme="monokai", line_numbers=(puzzle.type != PuzzleType.BUG))
+            console.print(Panel(syntax, title=self._t("code"), border_style="blue" if puzzle.type == PuzzleType.OUTPUT else "red"))
             
             console.print(f"\n[bold yellow]{puzzle.question}[/bold yellow]")
             
@@ -94,8 +115,12 @@ class GameEngine:
             
             # Check answer
             if answer == puzzle.correct_answer:
-                console.print(f"\n[bold green]{self._t('correct')}[/bold green]")
+                xp_reward = {Difficulty.EASY: 10, Difficulty.MEDIUM: 20, Difficulty.HARD: 30}[puzzle.difficulty]
                 self.score += 1
+                self.profile['xp'] += xp_reward
+                self.profile['solved'] += 1
+                
+                console.print(f"\n[bold green]{self._t('correct')}[/bold green] [bold magenta]{self._t('xp_gained', xp=xp_reward)}[/bold magenta]")
             else:
                 correct_idx = puzzle.correct_answer - 1
                 console.print(f"\n[bold red]{self._t('incorrect')}[/bold red] [bold]{puzzle.options[correct_idx]}[/bold]")
@@ -106,6 +131,7 @@ class GameEngine:
                 console.input(f"\n[dim]{self._t('press_enter_next')}[/dim]")
                 
         self.show_results()
+        self.save_profile()
         
     def show_results(self):
         console.clear()
@@ -122,4 +148,8 @@ class GameEngine:
             
         panel = Panel(Text.assemble(score_text, feedback), border_style="yellow", expand=False)
         console.print(panel)
+        
+        stats = Text(self._t("profile_stats", xp=self.profile['xp'], solved=self.profile['solved']), style="bold magenta", justify="center")
+        console.print(Panel(stats, border_style="magenta", expand=False))
+        
         console.print(f"\n[dim]{self._t('thanks')}[/dim]")
