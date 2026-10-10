@@ -4,7 +4,7 @@ UI_STRINGS = {
         "welcome_subtitle": "Учим Python на хитрых примерах и загадках.\n",
         "profile_stats": "🌟 Твой профиль | Опыт: {xp} XP | Решено загадок: {solved}",
         "press_enter": "Нажмите Enter, чтобы начать...",
-        "press_enter_next": "Нажмите Enter для следующей загадки...",
+        "press_enter_next": "Нажмите Enter для продолжения...",
         "puzzle": "Загадка",
         "type_output": "🔍 УГАДАЙ ВЫВОД",
         "type_bug": "🐞 НАЙДИ БАГ",
@@ -25,14 +25,18 @@ UI_STRINGS = {
         "level_medium": "Средний",
         "level_hard": "Сложный",
         "thanks": "Спасибо за игру в LernPy!",
-        "level_not_found": "К сожалению, для этого уровня пока нет загадок."
+        "level_not_found": "К сожалению, для этого уровня пока нет загадок.",
+        "lives": "❤️ Жизни: {lives}",
+        "combo": "🔥 Комбо: x{combo}",
+        "combo_bonus": "(Бонус за серию: +{bonus} XP)",
+        "out_of_lives": "💀 У вас закончились жизни! Попробуйте снова в следующий раз."
     },
     "en": {
         "welcome_title": "Welcome to LernPy! 🐍",
         "welcome_subtitle": "Learn Python through tricky examples and puzzles.\n",
         "profile_stats": "🌟 Your Profile | Experience: {xp} XP | Puzzles solved: {solved}",
         "press_enter": "Press Enter to start...",
-        "press_enter_next": "Press Enter for the next puzzle...",
+        "press_enter_next": "Press Enter to continue...",
         "puzzle": "Puzzle",
         "type_output": "🔍 GUESS OUTPUT",
         "type_bug": "🐞 FIND THE BUG",
@@ -47,12 +51,16 @@ UI_STRINGS = {
         "feedback_perfect": "🎉 Excellent! You are a true Python ninja!",
         "feedback_good": "👍 Not bad, but there's room for improvement. Keep practicing!",
         "feedback_bad": "📚 You need more practice. Python has many non-obvious things!",
-        "choose_lang": "Choose language / Выберите язык:",
+        "choose_lang": "Choose language / Выберите language:",
         "choose_level": "Choose difficulty level:",
         "level_easy": "Easy",
         "level_medium": "Medium",
         "level_hard": "Hard",
         "thanks": "Thanks for playing LernPy!",
-        "level_not_found": "Sorry, there are no puzzles for this level yet."
+        "level_not_found": "Sorry, there are no puzzles for this level yet.",
+        "lives": "❤️ Lives: {lives}",
+        "combo": "🔥 Combo: x{combo}",
+        "combo_bonus": "(Streak bonus: +{bonus} XP)",
+        "out_of_lives": "💀 You ran out of lives! Try again next time."
     }
 }

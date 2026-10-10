@@ -1,5 +1,6 @@
 import json
 import os
+import random
 from rich.console import Console
 from rich.panel import Panel
 from rich.syntax import Syntax
@@ -20,6 +21,8 @@ class GameEngine:
         self.puzzles = []
         self.score = 0
         self.total = 0
+        self.lives = 3
+        self.combo = 0
         self.profile = self.load_profile()
         
     def load_profile(self):
@@ -67,9 +70,10 @@ class GameEngine:
         else:
             self.level = Difficulty.HARD
 
-        # Filter puzzles
+        # Filter and shuffle puzzles
         all_puzzles = self.puzzles_db[self.lang]
         self.puzzles = [p for p in all_puzzles if p.difficulty == self.level]
+        random.shuffle(self.puzzles)
         self.total = len(self.puzzles)
         
     def show_welcome(self):
@@ -92,11 +96,15 @@ class GameEngine:
 
         self.show_welcome()
         
+        self.lives = 3
+        self.combo = 0
+        
         for idx, puzzle in enumerate(self.puzzles, 1):
             console.clear()
             
             puzzle_type_str = self._t("type_bug") if puzzle.type == PuzzleType.BUG else self._t("type_output")
-            console.rule(f"[bold cyan]{self._t('puzzle')} {idx}/{self.total} | {puzzle_type_str} | {puzzle.title}[/bold cyan]")
+            status_str = f"{self._t('lives', lives=self.lives)} | {self._t('combo', combo=self.combo)}"
+            console.rule(f"[bold cyan]{self._t('puzzle')} {idx}/{self.total} | {puzzle_type_str}[/bold cyan] | {status_str}")
             
             # Show code
             syntax = Syntax(puzzle.code, "python", theme="monokai", line_numbers=(puzzle.type != PuzzleType.BUG))
@@ -115,18 +123,33 @@ class GameEngine:
             
             # Check answer
             if answer == puzzle.correct_answer:
-                xp_reward = {Difficulty.EASY: 10, Difficulty.MEDIUM: 20, Difficulty.HARD: 30}[puzzle.difficulty]
+                self.combo += 1
+                base_xp = {Difficulty.EASY: 10, Difficulty.MEDIUM: 20, Difficulty.HARD: 30}[puzzle.difficulty]
+                
+                multiplier = 1.0 + (self.combo - 1) * 0.5 if self.combo > 0 else 1.0
+                total_xp = int(base_xp * multiplier)
+                bonus_xp = total_xp - base_xp
+                
                 self.score += 1
-                self.profile['xp'] += xp_reward
+                self.profile['xp'] += total_xp
                 self.profile['solved'] += 1
                 
-                console.print(f"\n[bold green]{self._t('correct')}[/bold green] [bold magenta]{self._t('xp_gained', xp=xp_reward)}[/bold magenta]")
+                console.print(f"\n[bold green]{self._t('correct')}[/bold green] [bold magenta]{self._t('xp_gained', xp=total_xp)}[/bold magenta]")
+                if bonus_xp > 0:
+                    console.print(f"[bold yellow]{self._t('combo_bonus', bonus=bonus_xp)}[/bold yellow]")
             else:
+                self.combo = 0
+                self.lives -= 1
                 correct_idx = puzzle.correct_answer - 1
                 console.print(f"\n[bold red]{self._t('incorrect')}[/bold red] [bold]{puzzle.options[correct_idx]}[/bold]")
                 
             console.print(Panel(f"[bold magenta]{self._t('explanation')}[/bold magenta]\n{puzzle.explanation}", border_style="magenta"))
             
+            if self.lives <= 0:
+                console.print(f"\n[bold red]{self._t('out_of_lives')}[/bold red]")
+                console.input(f"\n[dim]{self._t('press_enter_next')}[/dim]")
+                break
+                
             if idx < self.total:
                 console.input(f"\n[dim]{self._t('press_enter_next')}[/dim]")
                 
@@ -139,7 +162,9 @@ class GameEngine:
         
         score_text = Text(self._t("score", score=self.score, total=self.total), style="bold yellow", justify="center")
         
-        if self.score == self.total:
+        if self.lives <= 0:
+             feedback = Text(f"\n💀 Вы не справились с уровнем сложности. Попробуйте еще раз!", justify="center", style="bold red")
+        elif self.score == self.total:
             feedback = Text(f"\n{self._t('feedback_perfect')}", justify="center")
         elif self.score >= self.total / 2:
             feedback = Text(f"\n{self._t('feedback_good')}", justify="center")
