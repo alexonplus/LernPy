@@ -29,7 +29,13 @@ UI_STRINGS = {
         "lives": "❤️ Жизни: {lives}",
         "combo": "🔥 Комбо: x{combo}",
         "combo_bonus": "(Бонус за серию: +{bonus} XP)",
-        "out_of_lives": "💀 У вас закончились жизни! Попробуйте снова в следующий раз."
+        "out_of_lives": "💀 У вас закончились жизни! Попробуйте снова в следующий раз.",
+        "level_cleared": "🎉 Уровень «{level}» успешно пройден!",
+        "proceed_next_level": "Перейти на следующий уровень сложности («{next_level}»)?",
+        "campaign_completed": "🏆 ГРАНДИОЗНАЯ ПОБЕДА! Вы одолели все уровни сложности!",
+        "bonus_life": "❤️ Награда за зачистку уровня: +1 жизнь!",
+        "yes_proceed": "Да, вперед!",
+        "no_exit": "Завершить игру и сохранить результат"
     },
     "en": {
         "welcome_title": "Welcome to LernPy! 🐍",
@@ -51,7 +57,7 @@ UI_STRINGS = {
         "feedback_perfect": "🎉 Excellent! You are a true Python ninja!",
         "feedback_good": "👍 Not bad, but there's room for improvement. Keep practicing!",
         "feedback_bad": "📚 You need more practice. Python has many non-obvious things!",
-        "choose_lang": "Choose language / Выберите language:",
+        "choose_lang": "Choose language / Выберите язык:",
         "choose_level": "Choose difficulty level:",
         "level_easy": "Easy",
         "level_medium": "Medium",
@@ -61,6 +67,12 @@ UI_STRINGS = {
         "lives": "❤️ Lives: {lives}",
         "combo": "🔥 Combo: x{combo}",
         "combo_bonus": "(Streak bonus: +{bonus} XP)",
-        "out_of_lives": "💀 You ran out of lives! Try again next time."
+        "out_of_lives": "💀 You ran out of lives! Try again next time.",
+        "level_cleared": "🎉 Level «{level}» cleared successfully!",
+        "proceed_next_level": "Proceed to the next difficulty level («{next_level}»)?",
+        "campaign_completed": "🏆 GRAND VICTORY! You conquered all difficulty levels!",
+        "bonus_life": "❤️ Level clear reward: +1 life!",
+        "yes_proceed": "Yes, let's go!",
+        "no_exit": "End game and save results"
     }
 }
